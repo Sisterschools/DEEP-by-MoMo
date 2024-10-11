@@ -1,4 +1,6 @@
-var serverAPI = ( uri, vars, method = 'POST', token, contentType = 'application/x-www-form-urlencoded', putAsPost = false) => {
+import { store } from './store.js';
+
+var server = ( uri, vars, method = 'POST', token, contentType = 'application/x-www-form-urlencoded', putAsPost = false) => {
 
   var headers = {
     "Content-Type": contentType,
@@ -39,4 +41,25 @@ var serverAPI = ( uri, vars, method = 'POST', token, contentType = 'application/
   .then( ( response ) => response.json())
 }
 
-export default serverAPI
+var makeErrorMsg = (response) => {
+  if(response && response.then){
+    response.then( ( e ) => {
+      var txt = ''
+      store.errorMsgHeader = e.message
+      for(var t in e.errors )
+        txt += e.errors[t]
+      store.errorMsgTxt = txt
+      store.error = true
+    })
+    .catch( () => {
+      store.errorMsgHeader = 'No Internet ?'
+      store.error = true      
+    })
+  }
+  else{
+    store.errorMsgHeader = 'No Internet ?'
+    store.error = true
+  }
+}
+
+export { server, makeErrorMsg }

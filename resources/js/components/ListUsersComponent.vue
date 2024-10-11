@@ -1,7 +1,7 @@
 <script setup>
   import { store } from '../store.js'
   import ListComponent from './ListComponent.vue'
-  import serverAPI from '../server.js'
+  import { server, makeErrorMsg } from '../API.js'
 
   defineProps({
   })
@@ -17,11 +17,11 @@ export default{
   },  
   mounted(){
     store.addNew = '/user/add'
-    serverAPI( '/api/users', null, 'GET', store.token )
-    .catch( console.log )
+    server( '/api/users', null, 'GET', store.token )
     .then( ( json ) => {
       this.items = json.data
     } )
+    .catch(makeErrorMsg)
   },
   methods:{
     selectUser( id ){
