@@ -2,6 +2,10 @@
 @import 'variables';
 
 #app main div{
+  img{
+    max-width: 100%;
+    max-height: $line-height;
+  }
   .table{
     width: 100%;
   }
@@ -45,6 +49,10 @@
     max-height: calc(2em + 2px);
     overflow-y: auto;
   }
+  .cell.img{
+    overflow: hidden;
+    text-align: center;
+  } 
   .cell.hide{
     display: none;
   }

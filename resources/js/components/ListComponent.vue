@@ -122,12 +122,14 @@ export default{
     },
     classIfNotVisibleColumn(key){
       var i = Object.keys(this.columns).indexOf(key),
-        min = Math.min(...this.visibleColumns)
+        min = Math.min(...this.visibleColumns),
+        typeCls = this.columns[key]['type'] || ''
+
       if(i == min)
-        return 'cell firstVisible'
+        return typeCls +' cell firstVisible'
       else if(this.visibleColumns.indexOf(i) == -1)
         return 'hide'
-      return 'cell'
+      return typeCls + ' cell'
     },
     tableClasses(){
       return 'table ' + (this.selectableRows && this.itemsHaveValidIds ? ' selectableRows' : '')
@@ -270,7 +272,14 @@ export default{
           :class="classIfNotVisibleColumn(index)"
           @click.stop="_onRowClick"
         >
-          {{ prop }}
+          <img 
+            v-if="columns[index]['type'] == 'img' && prop"
+            :src="prop"
+            alt="image" 
+          >
+          <span v-else>
+            {{ prop }}
+          </span>
         </div>
       </div>
     </div>

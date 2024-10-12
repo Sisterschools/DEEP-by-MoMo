@@ -18,7 +18,7 @@ const routes = [
     { path: '/list-schools', component: ListSchools },
     { path: '/view-school/:id', name:'viewschool', component: ViewSchool },
     { path: '/edit-school::id', name:'editschool', component: EditSchool},
-    { path: '/schools/add', name:'addschool', component: ViewSchool },
+    { path: '/schools/add', name:'addschool', component: EditSchool },
     { path: '/list-users', component: ListUsers},
     { path: '/view-user/:id', name:'viewuser', component: ViewUser },
     { path: '/edit-user/:id', name:'edituser', component: EditUser},

@@ -37,13 +37,13 @@ export default{
     :items="items"
     :columns="{
       id: {type:'id', visible:false},
+      photo:{ type:'img'}, 
       title:{type:'string', as:'name'}, 
       website: {type:'string'}, 
       phone_number:{ as:'phone'}, 
       founding_year:{ as:'founded'}, 
       student_capacity:{ as:'# students'}, 
       user:{ as:'admin', subItem:{user: 'user.email'}}, 
-      photo:{ }, 
       address:{ }, 
       description:{ },
       created_at:{ type:'date', visible:false}, 

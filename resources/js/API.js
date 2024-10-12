@@ -3,9 +3,11 @@ import { store } from './store.js';
 var server = ( uri, vars, method = 'POST', token, contentType = 'application/x-www-form-urlencoded', putAsPost = false) => {
 
   var headers = {
-    "Content-Type": contentType,
     "Accept": "application/json",
   } 
+
+  if(contentType != 'multipart/form-data')
+    headers['Content-Type'] = contentType
 
   if( token ){
     headers["Authorization"] = "Bearer " + token

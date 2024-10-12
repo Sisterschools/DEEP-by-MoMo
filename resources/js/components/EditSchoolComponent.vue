@@ -19,6 +19,7 @@ export default{
       website: 'http',
       founding_year: '',
       student_capacity: '',
+      photo: null
     }
   },
   mounted(){
@@ -31,6 +32,10 @@ export default{
     }
   },
   methods:{
+    getPhoto( event ){
+      if( event.target && event.target.files )
+        this.photo = event.target.files[0]
+    },
     updateData( t, inp ){
       for( var i in inp){
         if(typeof inp[i] == 'object')
@@ -43,8 +48,8 @@ export default{
       var uri = '/api/schools',
         method = 'POST',
         id = this.$route.params.id,
-        contentType = id ? '' : 'application/x-www-form-urlencoded',
-        putAsPost = id? true : false
+        contentType = 'multipart/form-data',
+        putAsPost = false
 
       if( id ){
         uri += '/' + id
@@ -66,7 +71,7 @@ export default{
         role: 'school' 
       }
 
-      if(typeof this.photo != 'undefined' )
+      if( this.photo )
         data = Object.assign(data, {photo: this.photo})
 
       server( uri, data, method, store.token, contentType, putAsPost )
@@ -99,6 +104,7 @@ export default{
         Photo :
         <input 
           type="file" 
+          @change="getPhoto"
         >
       </label>
       <label v-if="! $route.params.id">
