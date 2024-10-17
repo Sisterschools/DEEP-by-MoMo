@@ -18,11 +18,13 @@ class UpdateSchoolRequest extends FormRequest
     {
         return [
             'title' => 'sometimes|required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'photo' => 'sometimes|nullable|image|mimes:jpg,png,jpeg|max:2048',
             'address' => 'sometimes|required|string',
-            'description' => 'sometimes|required|string',
+            'country' => 'nullable|string',
+            'description' => 'nullable|string',
+            'language' => 'nullable|string',
             'phone_number' => 'nullable|string|max:20',
-            'website' => 'nullable|url',
+            'website' => 'nullable|string',
             'founding_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'student_capacity' => 'nullable|integer|min:1',
         ];

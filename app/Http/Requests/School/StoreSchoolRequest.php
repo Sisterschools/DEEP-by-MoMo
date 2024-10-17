@@ -19,9 +19,11 @@ class StoreSchoolRequest extends FormRequest
             'title' => 'required|string|max:255',
             'photo' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             'address' => 'required|string',
-            'description' => 'required|string',
+            'country' => 'nullable|string',
+            'language' => 'nullable|string',
+            'description' => 'nullable|string',
             'phone_number' => 'nullable|string|max:20',
-            'website' => 'nullable|url',
+            'website' => 'nullable|string',
             'founding_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'student_capacity' => 'nullable|integer|min:1',
 

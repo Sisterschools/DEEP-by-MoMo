@@ -1,192 +1,176 @@
 <script setup>
-import server from '../server.js'
-import makeErrorMsg from '../makeErrorMsg.js'
-import  { store } from '../store.js'
-import Form from './FormComponent.vue'
+  import { server, makeErrorMsg } from '../API.js';
+  import { store } from '../store.js';
+  import { dateFormat } from '../dateFormat.js';
+
+  import View from './ViewComponent.vue';
+  import List from './ListComponent.vue';
 </script>
 
 <script>
 export default{
   data(){
     return{
-      title: '',
-      name: '',
-      email: '',
-      password: '',
-      password_confirmation: '',
-      address: '',
-      description: '',
-      phone_number: '',
-      website: 'http',
-      founding_year: '',
-      student_capacity: '',
+      data: [],
+      teachers: [],
+      students: []
     }
   },
-  mounted(){
-    if( this.$route.params.id ){
-      server( '/api/schools/' + this.$route.params.id, [], 'GET', store.token )
-      .then( ( json ) => {
-        this.updateData(this, json.data)
-      })
-    }
+  beforeMount(){
+    this.getSchool()
+    this.getTeachers()
+    this.getStudents()
   },
   methods:{
-    updateData( t, inp ){
-      for( var i in inp){
-        if(typeof inp[i] == 'object')
-          this.updateData(t, inp[i])
-        else if( typeof t[i] != 'undefined')
-          t[i] = inp[i]
-      }
-    },
-    addOrUpdateSchool(){
-      var uri = '/api/schools',
-        method = 'POST',
-        id = this.$route.params.id,
-        contentType = id ? '' : 'application/x-www-form-urlencoded',
-        putAsPost = id? true : false
-
-      if( id ){
-        uri += '/' + id
-        method = 'PUT'
-      }
-
-      var data = { 
-        name: this.name,
-        title: this.title,
-        email: this.email,
-        password: this.password,
-        password_confirmation: this.password_confirmation,
-        address: this.address,
-        description: this.description,
-        phone_number: this.phone_number,
-        website: this.website,
-        founding_year: this.founding_year,
-        student_capacity: this.student_capacity,
-        role: 'school' 
-      }
-
-      if(typeof this.photo != 'undefined' )
-        data = Object.assign(data, {photo: this.photo})
-
-      server( uri, data, method, store.token, contentType, putAsPost )
-      .then( ( ) => {
-        store.router.push('/')
+    getSchool(){
+      server('/api/schools/' + this.$route.params.id, [], 'GET', store.token )
+      .then( ( response ) => {
+        this.data = response.data
+        store.currentSchool = this.$route.params.id
       })
       .catch(makeErrorMsg)
     },
+    getTeachers(){
+      server('/api/schools/' + this.$route.params.id + '/teachers', [], 'GET', store.token )
+      .then( (response) => this.teachers = response.data)
+      .catch(makeErrorMsg)
+    },
+    getStudents(){
+      server('/api/schools/' + this.$route.params.id + '/students', [], 'GET', store.token )
+      .then( (response) => this.students = response.data)
+      .catch(makeErrorMsg)
+    },
+    editStudent( id ){
+      store.router.push('/edit-student/' + id)
+    },
+    editTeacher( id ){
+      store.router.push('/edit-teacher/' + id)
+    },
+    deleteTeacher( value ){
+      return server('/api/teachers/' + value, [], 'DELETE', store.token)
+    },
+    deleteStudent( value ){
+      return server('/api/students/' + value, [], 'DELETE', store.token)
+    },
+    deleteTeachers(ids){
+      new Promise((resolve) => {
+        ids.reduce( (previous, value) => previous.then(this.deleteTeacher(value).catch(makeErrorMsg)), Promise.resolve())
+        .then(resolve)
+      })
+      .catch(console.log)
+      .then(() => {
+        this.getTeachers()
+      })
+    },
+    deleteStudents(ids){
+      new Promise((resolve) => {
+        ids.reduce( (previous, value) => previous.then(this.deleteStudent(value).catch(makeErrorMsg)), Promise.resolve())
+        .then(resolve)
+      })
+      .catch(console.log)
+      .then(() => {
+        this.getStudents()
+      })
+    }
   }
 }
 </script>
 
 <template>
-  <div>
-    <Form 
-      cancel="Cancel"
-      :caption="$route.params.id? 'Update school' : 'New school'"
-      @form-submitted="addOrUpdateSchool"
-    >
-      <label>
-        Name of the school : 
-        <input 
-          v-model="title"
-          required
-          maxlength="255"
-          autocomplete="false"
+  <View 
+    :id="$route.params.id" 
+    entity="school"
+    :data="data"
+  >
+    <template #first>
+      <div>
+        <img 
+          alt="logo"
+          :src="data['photo'] ? data['photo'] : 'img/icon2024original.png'"
         >
-      </label>
-      <label>
-        Photo :
-        <input 
-          type="file" 
-        >
-      </label>
-      <label v-if="! $route.params.id">
-        Name of contact person : 
-        <input 
-          v-model="name"
-          required
-          autocomplete="false"
-        >
-      </label>
-      <label>
-        Email to log in : 
-        <input 
-          v-model="email"
-          required
-          type="email"
-          autocomplete="email"
-        >
-      </label>
-      <label v-if="! $route.params.id">
-        Password : 
-        <input 
-          v-model="password"
-          required
-          type="password"
-          minlength="8"
-          autocomplete="new-password"
-        >
-      </label>
-      <label v-if="! $route.params.id">
-        Password : 
-        <input 
-          v-model="password_confirmation"
-          required
-          type="password"
-          minlength="8"
-          autocomplete="new-password"
-        >
-      </label>
-      <label>
-        Address : 
-        <textarea 
-          v-model="address"
-          required
-          autocomplete="false"
+        <div class="view">
+          <div 
+            v-for="(d, index) in data"
+            :key="d"
+          >
+            <div 
+              v-if="index == 'user'"
+            >
+              <span>{{ index.replaceAll('_', ' ') }}&nbsp;:&nbsp;</span>
+              <span>{{ data[index].name }}, {{ data[index].email }} </span>
+            </div>
+            <div v-else-if="index == 'created_at' || index == 'updated_at'">
+              <span>{{ index.replaceAll('_', ' ') }}&nbsp;:&nbsp;</span>
+              <span>{{ dateFormat(d, { year: 'numeric', month: 'short', day:'numeric', }) }}</span>
+            </div>       
+            <div v-else-if="index != 'photo'">
+              <span>{{ index.replaceAll('_', ' ') }}&nbsp;:&nbsp;</span>
+              <span>{{ d }} </span>
+            </div> 
+          </div>
+        </div>
+      </div>
+    </template>
+    <template #second>
+      <div>
+        <List 
+          entity="project" 
+          caption="Project"
+          :columns="{}"
+          :items="[]"
         />
-      </label>
-      <label>
-        Description : 
-        <input 
-          v-model="description"
-          required
-          autocomplete="false"
-        >
-      </label>
-      <label>
-        Phone : 
-        <input 
-          v-model="phone_number"
-          type="tel"
-          maxlength="20"
-          autocomplete="false"
-        >
-      </label>
-      <label>
-        Website : 
-        <input 
-          v-model="website"
-          type="URL"
-          autocomplete="false"
-        >
-      </label>
-      <label>
-        Founding year : 
-        <input 
-          v-model="founding_year"
-          min="1800"
-          max="2024"
-          autocomplete="false"
-        >
-      </label>
-      <label>
-        Student capacity : 
-        <input 
-          v-model="student_capacity"
-          autocomplete="false"
-        >
-      </label>
-    </Form>
-  </div>
+      </div>
+      <div class="cols">
+        <List 
+          v-if="store.userData.role == 'school' || store.userData.role == 'admin'"
+          entity="teacher" 
+          caption="Teachers"
+          :selectable-rows="true"
+          :shift-click="true"
+          :show-header="false"
+          :columns="{id: {type:'id', visible:false},photo: {type:'img'}, name: {}, user:{ as:'login', subItem:{user: 'user.email'}}}"
+          :items="teachers"
+          :caption-is-foldable="true"
+          @rowclick="editTeacher"
+          @delete="deleteTeachers"
+        />
+        <List 
+          v-if="store.userData.role == 'school' || store.userData.role == 'admin'"
+          entity="student" 
+          caption="Students"
+          :selectable-rows="true"
+          :shift-click="true"
+          :show-header="false"
+          :columns="{id: {type:'id', visible:false},photo: {type:'img'}, name: {}, user:{ as:'login', subItem:{user: 'user.email'}}}"
+          :items="students"
+          :caption-is-foldable="true"
+          @rowclick="editStudent"
+          @delete="deleteStudents"
+        />
+      </div>
+    </template>
+  </View>
 </template>
+
+<style scoped>
+img{
+  margin: 0 4em;
+  float: left;
+  width: 12em;
+
+}
+div > span:nth-child(1){
+  display: inline-block;
+  width: 33.33%;
+  max-width: 12em;
+  font-weight: bolder;
+}
+div > span:nth-child(2){
+  display: inline-block;
+  width: 66.667%;
+}
+.view > div{
+  width: 50%;
+  float: left;
+}
+</style>

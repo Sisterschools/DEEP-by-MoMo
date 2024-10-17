@@ -1,7 +1,7 @@
 <script setup>
   import { store } from '../store.js'
   import Form from './FormComponent.vue'
-  import serverAPI from '../server.js'
+  import { server, makeErrorMsg } from '../API.js'
 
   defineProps({
     caption: {type:String, default:'Login form'},
@@ -23,18 +23,17 @@ export default{
   methods: {
     login() {
       this.invalid = false
-      serverAPI('/api/login', {
-        email: this.email, 
-        password: this.password
-      }, 
-      'POST', 
+      server('/api/login', {
+          email: this.email, 
+          password: this.password
+        }, 
+        'POST' 
       )
-      .catch( () => this.invalid = true )
       .then( ( json ) => {
         if(this.invalid == false){
           this.invalid = false
           store.token = json.access_token
-          store.userData = json
+          store.userData = json.data
           
           /*  
             Different users can login using a different tab: so start the title with their name
@@ -42,6 +41,13 @@ export default{
           var title = document.querySelector('title').innerText
           document.querySelector('title').innerText = json.data.name + ' : ' + title
         }
+      })
+      .catch( ( resp ) => { 
+        // If failed to fetch show the error mesage, otherwise let the login form handle errors
+        if( resp instanceof TypeError )
+          makeErrorMsg(resp)
+        else 
+          this.invalid = true 
       })
     }
   }
@@ -85,7 +91,7 @@ export default{
       >
     </label>
     <p class="small-font italic">
-      <RouterLink to="/reset-password">
+      <RouterLink to="/forgot-password">
         Forgot your password?
       </RouterLink>
     </p>

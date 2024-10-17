@@ -15,9 +15,13 @@ class School extends Model
         'title',
         'photo',
         'address',
+        'country',
+        'language',
         'description',
         'phone_number',
         'website',
+        'country',
+        'language',
         'founding_year',
         'student_capacity',
     ];

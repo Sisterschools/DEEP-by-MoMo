@@ -46,6 +46,7 @@ Before using the API, ensure you have completed the following steps:
 
     ```
     npm run dev
+    php artisan storage:link
     php artisan serve
     ```
 

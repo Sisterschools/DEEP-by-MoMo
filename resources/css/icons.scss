@@ -9,7 +9,7 @@
 }
 .icon *{
   stroke: var(--momo-white);
-  stroke-width: 5px;
+  stroke-width: 2px;
   fill: none;
 }
 nav{
@@ -20,9 +20,9 @@ nav > div:nth-last-child(1){
   cursor: pointer;
   float:right;
   font-size: 120%;
-  background-color: var(--momo-green);
+  background-color: var(--momo-white);
   color: var(--momo-white);
-  padding: 0 1.5em;
-  border: 3px solid var(--momo-green);
+  padding: 0 0.25em;
+  border: 2px solid var(--momo-blue);
   border-radius: 3px;
 }
