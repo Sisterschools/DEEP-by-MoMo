@@ -11,6 +11,8 @@ Route::controller(AuthController::class)->group(function () {
         ->name('password.email');
     Route::post('/reset-password', 'resetPassword')
         ->name('password.reset');
+    Route::post('/password/setup', 'passwordSetup')
+        ->name('password.setup');
 });
 
 

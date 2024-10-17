@@ -95,7 +95,7 @@ Authentication for this API is handled using Bearer tokens. After a successful l
 
 ### Password Setup
 
-- **URL:** `/api/users/password/reset`
+- **URL:** `/api/password/setup`
 - **Method:** `POST`
 - **Description:** Set up or reset the password for a user using a valid token
 - **Required Fields:**
@@ -142,7 +142,7 @@ Authentication for this API is handled using Bearer tokens. After a successful l
 - **Response:**
   - Success: `200` with message `"Password reset successfully"`
   - Failure: `400` with message `"Invalid reset token"`
-  
+
 ## Using Authentication for Protected Routes
 
 For all protected routes, you must include the Bearer token in the Authorization header of your HTTP request. Here's an example of how to structure your requests:
