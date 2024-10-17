@@ -6,7 +6,7 @@ var server = ( uri, vars, method = 'POST', token, contentType = 'application/x-w
     "Accept": "application/json",
   } 
 
-  if(contentType != 'multipart/form-data')
+  if(contentType !== 'multipart/form-data')
     headers['Content-Type'] = contentType
 
   if( token ){
@@ -15,10 +15,13 @@ var server = ( uri, vars, method = 'POST', token, contentType = 'application/x-w
 
   var body = new URLSearchParams(vars)
 
-  if(contentType == ''){
+  if(contentType == 'multipart/form-data'){
     body = new FormData()
     for(var i in vars){
-      body.append(i, vars[i])
+      if(vars[i] instanceof Array)
+        vars[i].forEach( (n, m) => body.append(i + '[]', vars[i][m]))
+      else
+        body.append(i, vars[i])
     }
     if(putAsPost)
       body.append('_method', 'PUT')
@@ -40,17 +43,14 @@ var server = ( uri, vars, method = 'POST', token, contentType = 'application/x-w
     if(response.ok && response.status < 300)
       return response
   })
-  .then( ( response ) => response.json())
+  .then( ( response ) => response.json().catch(() => {} ))
 }
 
 var makeErrorMsg = (response) => {
   if(response && response.then){
     response.then( ( e ) => {
-      var txt = ''
-      store.errorMsgHeader = e.message
-      for(var t in e.errors )
-        txt += e.errors[t]
-      store.errorMsgTxt = txt
+      store.errorMsgHeader = e.message || 'Error'
+      store.errorMsgTxts = e.errors
       store.error = true
     })
     .catch( () => {
@@ -58,9 +58,16 @@ var makeErrorMsg = (response) => {
       store.error = true      
     })
   }
-  else{
-    store.errorMsgHeader = 'No Internet ?'
+  else if(typeof response == 'string'){
+    store.errorMsgHeader = ''
+    store.errorMsgTxts = response
     store.error = true
+  }
+  else{
+    store.errorMsgHeader = 'No Internet?'
+    store.error = true
+    console.log(response)
+    store.errorMsgTxts = response
   }
 }
 

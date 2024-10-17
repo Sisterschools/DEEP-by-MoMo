@@ -1,5 +1,7 @@
 <script setup>
   import ListSchoolsComponent from './ListSchoolsComponent.vue'
+  import ViewSchoolComponent from './ViewSchoolComponent.vue'
+  import ViewProgram from './ViewProgramme.vue'
   
   defineProps({
     userData: { type:{}, required: true, default: null}
@@ -10,7 +12,12 @@
   export default{
     computed: {
       whichComponent(){
-        return ListSchoolsComponent;
+        if(this.userData.role == 'admin')
+          return ListSchoolsComponent;
+        else if( this.userData.role == 'school')
+          return ViewSchoolComponent
+        else
+          return ViewProgram
       }
     },
   }

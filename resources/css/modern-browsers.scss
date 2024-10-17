@@ -160,7 +160,7 @@
       min-width: 25%;
       max-width: 25%;
     }
-    .selectableRows :nth-child(1 of .cell):nth-last-child(13 of .cell).firstVisible{
+    .selectableRows .row :nth-child(1 of .cell):nth-last-child(13 of .cell).firstVisible{
       min-width: calc(25% - $action-column-width);
       max-width: calc(25% - $action-column-width);
     }
@@ -172,7 +172,7 @@
       min-width: 33.33333%;
       max-width: 33.33333%;
     }
-    .selectableRows :nth-child(1 of .cell):nth-last-child(12 of .cell).firstVisible{
+    .selectableRows .row :nth-child(1 of .cell):nth-last-child(12 of .cell).firstVisible{
       min-width: calc(33.3333% - $action-column-width);
       max-width: calc(33.3333% - $action-column-width);
     }
@@ -184,7 +184,7 @@
       min-width: 33.33333%;
       max-width: 33.33333%;
     }
-    .selectableRows :nth-child(1 of .cell):nth-last-child(11 of .cell).firstVisible{
+    .selectableRows .row :nth-child(1 of .cell):nth-last-child(11 of .cell).firstVisible{
       min-width: calc(33.3333% - $action-column-width);
       max-width: calc(33.3333% - $action-column-width);
     }
@@ -196,7 +196,7 @@
       min-width: 20%;
       max-width: 20%;
     }
-    .selectableRows :nth-child(1 of .cell):nth-last-child(10 of .cell).firstVisible{
+    .selectableRows .row :nth-child(1 of .cell):nth-last-child(10 of .cell).firstVisible{
       min-width: calc(20% - $action-column-width);
       max-width: calc(20% - $action-column-width);
     }

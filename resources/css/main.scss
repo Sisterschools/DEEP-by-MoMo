@@ -37,7 +37,7 @@ input:focus{
         100% {transform: translateX(-10px);}
       }
     form{
-        width: 20em;
+        width: 24em;
         max-width: 100%;
         margin: 2em auto;
         padding: 8px;
@@ -80,15 +80,45 @@ input:focus{
     .hide{
         display: none;
     }
+    .unvisible{
+      visibility: hidden;
+    }
     .expandable{
-      display: inline-block;
-      color: var(--momo-blue);
+      cursor: pointer;
+      float: left;
+      margin: 0 0.5em;;
     }
     .expandable:before{
       content: '\25b7';
     }
     .expanded{
       transform: rotate(90deg);
+    }
+    .blue{
+      color: var(--momo-blue);
+    }
+    .bg-blue{
+      background-color: var(--momo-blue);
+    }
+    .white{
+      color: var(--momo-white);
+    }
+    .bg-white{
+      color: var(--momo-white);
+    }
+    .no-underline{
+      text-decoration: none;
+    }
+    .view{
+      float: left;
+      line-height: 2em;
+      width: calc(100% - 12em - 8em);
+    }
+    .right{
+      float: right;
+    }
+    .bold{
+      font-weight: bold;
     }
     nav,
     main,
@@ -140,17 +170,27 @@ input:focus{
     .clr-border-left-admin,
     .clr-border-left-admin ul{
         box-shadow:2px 0 0 0 var(--momo-red) inset;
+        border-bottom:2px solid var(--momo-red);
     }
     .clr-border-left-school,
     .clr-border-left-school ul{
         box-shadow:2px 0 0 0 var(--momo-purple) inset;
+        border-bottom:2px solid var(--momo-purple);
     }
     .clr-border-left-teacher,
     .clr-border-left-teacher ul{
         box-shadow:2px 0 0 0 var(--momo-blue) inset;
+        border-bottom:2px solid var(--momo-blue);
     }
     .clr-border-left-student,
     .clr-border-left-student ul{
         box-shadow:2px 0 0 0 var(--momo-green) inset;
+        border-bottom:2px solid var(--momo-green);
     }
+}
+
+@media screen and (max-width: calc(80em)){
+  #app img + div.view{
+    width: 100%;
+  }
 }

@@ -7,7 +7,14 @@
     v-if="store.error"
   >
     <h3>{{ store.errorMsgHeader }}</h3>
-    <p>{{ store.errorMsgTxt }}</p>
+    <ul>
+      <li 
+        v-for="error in store.errorMsgTxts"
+        :key="error"
+      >
+        {{ error }}
+      </li>
+    </ul>
     <button @click="store.error = false">
       Close
     </button>

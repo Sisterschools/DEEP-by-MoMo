@@ -1,23 +1,29 @@
 <script setup>
   import { RouterLink } from 'vue-router';
   import { store } from '../store.js'
+  import { dateFormat } from '../dateFormat.js';
 
   defineProps({
+    entity: {type:String, default: ''},
     columns: {type:Object, required:true, default: new Object},
     selectableRows: {type: Boolean, required: false, default: false},
+    showHeader: {type: Boolean, required: false, default: true},
     shiftClick: {type: Boolean, required: false, default: false},
     showIDColumn: { type: Boolean, required: false, default: false}, 
     items: {type: Array, required: true, default: new Array},
-    onRowClick: {type: Function, required: false, default: () => {}},
     caption: {type: String, required: true, default: 'List'},
+    captionIsFoldable: {type: Boolean, required:false, default: false},
+    selectColumns: {type: Boolean, required:false, default: false}
   })
 </script>
 
 <script>
 export default{
+  emits:['delete', 'rowclick'],
   data(){
     return {
       showItems: [],
+      expanded: false,
       itemsHaveValidIds: true,
       selectedIds: [],
       prevSelected: null,
@@ -41,19 +47,7 @@ export default{
           for(var i in item){
             if( i == j ){
               if(this.columns[j]['type'] == 'date'){
-                var d = new Date(item[j])
-                if( d ){
-                  var opts = this.columns[j]['params'] || 
-                    {
-                      year: 'numeric', 
-                      month: 'short', 
-                      day:'numeric', 
-                      hour:'numeric', 
-                      minute: 'numeric'
-                    }
-                  d = d.toLocaleDateString('en-EN', opts)
-                  item[j] = d
-                }
+                item[j]  = dateFormat(this.columns[j], this.columns[j]['params'])
               }
               newItem = Object.assign({ [i]: item[j] }, newItem)
             }
@@ -114,6 +108,22 @@ export default{
     store.isListComponent = false;
   },
   methods:{
+    hideBulkActions(){
+      var el = this.$el.querySelector('div.dropdown')
+      if(el && ! el.classList.contains('hide'))
+        el.classList.add('hide')
+    },
+    toggleBulkActions(){
+      var el = this.$el.querySelector('div.dropdown')
+      el.classList.toggle('hide')
+    },
+    toggleFolded(){
+      this.$el.querySelector('.expand').classList.toggle('hide')
+      this.$el.querySelector('.expandable').classList.toggle('expanded')
+      this.expanded =! this.expanded
+      if( ! this.expanded )
+        this.hideBulkActions()
+    },
     toggleDropdown(){
       var el = this.$el.querySelector('ul.dropdown'),
         icon = this.$el.querySelector('.expandable')
@@ -134,12 +144,16 @@ export default{
     tableClasses(){
       return 'table ' + (this.selectableRows && this.itemsHaveValidIds ? ' selectableRows' : '')
     },
+    deleteClick(){
+      this.$emit('delete', Object.values(this.selectedIds))
+    },
     onShiftClick(evnt){
       if(evnt.target.nodeName == 'INPUT'){
-        var cell = evnt.target.closest('.row').querySelector('.cell:nth-child(2)'),
+        var cell = evnt.target.closest('.row').querySelector('.cell'),
         selId = cell.getAttribute('data-src')
-        if(evnt.shiftKey){
-          selId && this.selectedIds.indexOf(selId) == -1 ? this.selectedIds.push(selId) : ''
+        if(evnt.shiftKey && selId ){
+          var val = parseInt(selId)
+          this.selectedIds.indexOf(val) == -1 ? this.selectedIds.push(val) : ''
           this.setPrevRowSelected(evnt.target)
         }
         else if(selId)
@@ -149,20 +163,20 @@ export default{
     setPrevRowSelected( rowEl ){
       if( ! rowEl || ! rowEl.closest ) return
       var prevRowEl = rowEl.closest('.row').previousSibling,
-        prevCell = prevRowEl && prevRowEl.querySelector ? prevRowEl.querySelector('.cell:nth-child(2)') : null,
+        prevCell = prevRowEl && prevRowEl.querySelector ? prevRowEl.querySelector('.cell') : null,
         selId = prevCell ? prevCell.getAttribute('data-src') : ''
       if( selId && selId != this.prevSelected && this.selectedIds.indexOf(selId) == -1)
-         this.selectedIds.push(selId)
+         this.selectedIds.push(parseInt(selId))
       else if(selId) return
       this.setPrevRowSelected( prevRowEl )
     },
-    _onRowClick( o ){
+    onRowClick( o ){
       var id = 
         o.target.closest('.row')
         .querySelector('div:not(.actions)')
         .getAttribute('data-src')
       if(id)
-        this.onRowClick( id )
+        this.$emit('rowclick', id)
     },
     selectOrDeselectAll( evnt ){
       if(! evnt.target.checked) 
@@ -172,6 +186,14 @@ export default{
           this.selectedIds.push(i[this.id])
         })
       }
+    },
+    verticalDotsClass(){
+      var cls = 'unvisible'
+      if(this.selectableRows && (! this.captionIsFoldable || this.expanded) && this.selectedIds.length > 0)
+        cls = 'vertical-dots'
+      this.expanded ? cls += ' white' : null
+
+      return cls
     }
   }
 }
@@ -179,17 +201,44 @@ export default{
 
 <template>
   <div>
-    <div class="header1">
+    <div 
+      class="header1"
+    >
       <div>
-        <select 
-          v-if="selectableRows"
-          :disabled="selectedIds.length == 0"
+        <div class="dropdown hide">
+          <span @click="deleteClick">- Delete</span>
+        </div>
+        <p
+          :class="captionIsFoldable ? 'bg-blue white' : ''" 
+          @click.stop="toggleFolded"
         >
-          <option>With selected ...</option>
-        </select>
-        <p>{{ caption }}</p>
+          <span 
+            v-if="captionIsFoldable" 
+            class="expandable white" 
+          />
+          <span 
+            :class="verticalDotsClass()"
+            @click.stop="toggleBulkActions"
+          >
+            &nbsp;
+            &vellip;
+            &nbsp;
+          </span>
+          {{ caption }}
+          <span v-if="captionIsFoldable">&nbsp;</span>
+          <span class="right ">
+            &nbsp;&nbsp;
+            <RouterLink 
+              class="white no-underline" 
+              :to="{path: '/' + entity + '/add'}"
+            >
+              &#10010;
+            </RouterLink>
+            &nbsp;&nbsp;
+          </span>
+        </p>
         <div>
-          <ul>
+          <ul v-if="selectColumns">
             <li
               @click="toggleDropdown"
             >
@@ -217,69 +266,73 @@ export default{
         </div>
       </div>
     </div>
-    <p v-if="(showItems = parseItems) && showItems.length == 0">
-      Nothing here yet: create one 
-      <RouterLink :to="store.addNew">
-        here
-      </RouterLink>
-    </p>
     <div 
-      v-else
-      :class="tableClasses()"
+      :class="captionIsFoldable ? 'hide expand': ''"
     >
+      <p v-if="(showItems = parseItems) && showItems.length == 0">
+        Nothing here yet: create one 
+        <RouterLink :to="{path: '/' + entity + '/add'}">
+          here
+        </RouterLink>
+      </p>
       <div 
-        v-if="showItems && showItems[0]"
-        class="row" 
+        v-else
+        :class="tableClasses()"
       >
         <div 
-          v-if="selectableRows && itemsHaveValidIds"
-          class="actions"
+          v-if="showItems && showItems[0]"
+          :class="showHeader ? 'row ' + (captionIsFoldable ? 'row bg-white' : '' ) : 'hide'" 
         >
-          <input
-            type="checkbox" 
-            class="selectAll"
-            @change="selectOrDeselectAll"
+          <div 
+            v-if="selectableRows && itemsHaveValidIds"
+            class="actions"
           >
-        </div>
-        <div
-          v-for="(value, key) in filtered0"
-          :key="key"
-          :class="classIfNotVisibleColumn(key)" 
-        >
-          {{ value }}
-        </div>
-      </div>
-      <div  
-        v-for="(item, n) in filtered"
-        :key="item"
-        class="row" 
-      >
-        <div 
-          v-if="selectableRows && itemsHaveValidIds"
-          class="actions"
-        >
-          <input 
-            v-model="selectedIds"
-            :value="items[n][id]"
-            type="checkbox"
-            @click="onShiftClick"
+            <input
+              type="checkbox" 
+              class="selectAll"
+              @change="selectOrDeselectAll"
+            >
+          </div>
+          <div
+            v-for="(value, key) in filtered0"
+            :key="key"
+            :class="classIfNotVisibleColumn(key)" 
           >
+            {{ value }}
+          </div>
         </div>
-        <div 
-          v-for="(prop, index) in item"
-          :key="prop"
-          :data-src="items[n][id]"
-          :class="classIfNotVisibleColumn(index)"
-          @click.stop="_onRowClick"
+        <div  
+          v-for="(item, n) in filtered"
+          :key="item"
+          class="row" 
         >
-          <img 
-            v-if="columns[index]['type'] == 'img' && prop"
-            :src="prop"
-            alt="image" 
+          <div 
+            v-if="selectableRows && itemsHaveValidIds"
+            class="actions"
           >
-          <span v-else>
-            {{ prop }}
-          </span>
+            <input 
+              v-model="selectedIds"
+              :value="items[n][id]"
+              type="checkbox"
+              @click="onShiftClick"
+            >
+          </div>
+          <div 
+            v-for="(prop, index) in item"
+            :key="prop"
+            :data-src="items[n][id]"
+            :class="classIfNotVisibleColumn(index)"
+            @click.stop="onRowClick"
+          >
+            <img 
+              v-if="columns[index]['type'] == 'img' && prop"
+              :src="prop"
+              alt="image" 
+            >
+            <span v-else>
+              {{ prop }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -287,6 +340,18 @@ export default{
 </template>
 
 <style scoped>
+.vertical-dots{
+  cursor: pointer;
+  float: left;
+}
+.dropdown{
+  cursor: pointer;
+  position:absolute;
+  margin: 1em 4em;
+  padding: 0.5em 0.5em;
+  border: 2px solid var(--momo-blue);
+  background-color: var(--momo-white);
+}
 .header1 div{
   box-sizing: border-box;
 }
@@ -294,9 +359,9 @@ export default{
   width: 100%;
 }
 .header1 select{
-  position: absolute;
-  left: 0.5em;
-  margin-top: 1em; 
+  float: left;
+  position: relative;
+  top:1em;
   padding: 0.5em 0.5em;
   min-width: 12em;
   max-width: 12em;
@@ -331,7 +396,7 @@ export default{
 }
 p{
   text-align: center;
-  width: calc(100% - 12em);
+  width: calc(100% - 0.5em);
   float:left;
 }
 .dropdown{

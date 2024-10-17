@@ -5,24 +5,31 @@ import Layout from './components/LayoutComponent.vue';
 import ListSchools from './components/ListSchoolsComponent.vue';
 import ViewSchool from './components/ViewSchoolComponent.vue';
 import EditSchool from './components/EditSchoolComponent.vue';
-import ListUsers from './components/ListUsersComponent.vue';
-import ViewUser from './components/ViewUserComponent.vue';
-import EditUser from './components/EditUserComponent.vue';
-import { createWebHashHistory, createRouter } from 'vue-router'
+import ViewTeacher from './components/ViewTeacherComponent.vue';
+import EditTeacher from './components/EditTeacherComponent.vue';
+import AddTeacher from './components/AddTeacherComponent.vue';
+import ViewStudent from './components/ViewStudentComponent.vue';
+import EditStudent from './components/EditStudentComponent.vue';
+import AddStudent from './components/AddStudentComponent.vue';
+import { createWebHashHistory, createRouter } from 'vue-router';
 
-import ResetPassword from './components/ResetPasswordComponent.vue'
+import ResetPassword from './components/ResetPasswordComponent.vue';
+import RequestPasswordReset from './components/RequestResetPasswordComponent.vue';
 
 const routes = [
     { path: '/', name:'home', component: Layout },
-    { path: '/reset-password', component: ResetPassword },
-    { path: '/list-schools', component: ListSchools },
+    { path: '/forgot-password', name:'forgotpassword', component: RequestPasswordReset},
+    { path: '/reset-password', name:'resetpassword', component: ResetPassword },
+    { path: '/list-schools', name:'listschools', component: ListSchools },
     { path: '/view-school/:id', name:'viewschool', component: ViewSchool },
-    { path: '/edit-school::id', name:'editschool', component: EditSchool},
-    { path: '/schools/add', name:'addschool', component: EditSchool },
-    { path: '/list-users', component: ListUsers},
-    { path: '/view-user/:id', name:'viewuser', component: ViewUser },
-    { path: '/edit-user/:id', name:'edituser', component: EditUser},
-    { path: '/user/add', name:'adduser', component: ViewUser },
+    { path: '/edit-school/:id', name:'editschool', component: EditSchool},
+    { path: '/school/add', name:'addschool', component: EditSchool },
+    { path: '/view-teacher/:id', name:'viewteacher', component: ViewTeacher },
+    { path: '/edit-teacher/:id', name:'editteacher', component: EditTeacher},
+    { path: '/teacher/add', name:'addteacher', component: AddTeacher },
+    { path: '/view-student/:id', name:'viewstudent', component: ViewStudent },
+    { path: '/edit-student/:id', name:'editstudent', component: EditStudent},
+    { path: '/student/add', name:'addstudent', component: AddStudent },
   ]  
 
 const router = createRouter({
@@ -30,12 +37,16 @@ const router = createRouter({
   routes,
 })
 
+var allow = ['resetpassword', 'forgotpassword']
+
 router.beforeEach(async (to) => {
   if (
     !store.token &&
-    to.name !== 'home'
+    to.name !== 'home' &&
+    allow.indexOf(to.name) == -1
   ) {
-    return { name: 'home' }
+    if(allow.indexOf(to.name) == -1)
+      return { name: 'home' }
   }
 })
 

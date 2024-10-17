@@ -2,6 +2,8 @@
 import "external-svg-loader";
 import { store } from './store.js'
 import school from '../svg/school.svg';
+import program from '../svg/program.svg'
+import project from '../svg/project.svg'
 import student from '../svg/student.svg'
 import teacher from '../svg/teacher.svg'
 
@@ -28,7 +30,7 @@ export default{
   <div class="header">
     <user-menu  
       v-if="store.token"
-      :user="store.userData ? store.userData.data : {}" 
+      :user="store.userData ? store.userData : {}" 
       class="user-details"
     >
       <li @click="logout">
@@ -41,31 +43,40 @@ export default{
   </div>
   <div>
     <nav v-if="store.token">
-      <RouterLink to="/">
+      <RouterLink 
+        to="/"
+      >
         <svg 
           :data-src="school" 
           class="icon" 
         />
       </RouterLink>
       &nbsp;
-      <RouterLink to="/list-users">
+      <RouterLink 
+        v-if="store.userData.role == 'admin'"
+        to="/"
+      >
         <svg 
-          :data-src="teacher" 
-          class="icon"
+          :data-src="project" 
+          class="icon" 
         />
       </RouterLink>
       &nbsp;
-      <RouterLink to="/list-users">
+      <RouterLink 
+        v-if="store.userData.role == 'admin'"
+        to="/"
+      >
         <svg 
-          :data-src="student" 
-          class="icon"
+          :data-src="program" 
+          class="icon" 
         />
       </RouterLink>
       <div 
-        v-if="store.isListComponent"
+        v-if="store.isListComponent && store.hasNew"
+        class="white bg-blue"
         @click="addNew"
       >
-        [+]
+        &#10010;
       </div>
     </nav>
     <main>

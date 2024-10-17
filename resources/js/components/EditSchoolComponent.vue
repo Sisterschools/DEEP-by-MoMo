@@ -9,6 +9,8 @@ export default{
   data(){
     return{
       title: '',
+      country: '',
+      language: '',
       name: '',
       email: '',
       password: '',
@@ -16,7 +18,7 @@ export default{
       address: '',
       description: '',
       phone_number: '',
-      website: 'http',
+      website: '',
       founding_year: '',
       student_capacity: '',
       photo: null
@@ -40,7 +42,7 @@ export default{
       for( var i in inp){
         if(typeof inp[i] == 'object')
           this.updateData(t, inp[i])
-        else if( typeof t[i] != 'undefined')
+        else if( typeof t[i] != 'undefined' && i != 'photo')
           t[i] = inp[i]
       }
     },
@@ -53,12 +55,14 @@ export default{
 
       if( id ){
         uri += '/' + id
-        method = 'PUT'
+        putAsPost = true
       }
 
       var data = { 
         name: this.name,
         title: this.title,
+        country: this.country,
+        language: this.language,
         email: this.email,
         password: this.password,
         password_confirmation: this.password_confirmation,
@@ -148,15 +152,26 @@ export default{
         Address : 
         <textarea 
           v-model="address"
-          required
           autocomplete="false"
         />
+      </label>
+      <label>
+        Country :
+        <input
+          v-model="country"
+        >
+      </label>
+      <label>
+        Language code :
+        <input
+          v-model="language"
+          maxlength="3"
+        >
       </label>
       <label>
         Description : 
         <input 
           v-model="description"
-          required
           autocomplete="false"
         >
       </label>
@@ -173,7 +188,7 @@ export default{
         Website : 
         <input 
           v-model="website"
-          type="URL"
+          type="text"
           autocomplete="false"
         >
       </label>
