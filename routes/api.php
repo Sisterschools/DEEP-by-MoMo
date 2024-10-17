@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\AuthController;
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login')
         ->name('login');
+    Route::post('/forgot-password', 'forgotPassword')
+        ->name('password.email');
+    Route::post('/reset-password', 'resetPassword')
+        ->name('password.reset');
 });
 
 

@@ -118,6 +118,31 @@ Authentication for this API is handled using Bearer tokens. After a successful l
 - **Headers:**
   - `Authorization: Bearer <your_access_token>`
 
+### Forgot Password
+- **URL:** `/api/forgot-password`
+- **Method:** `POST`
+- **Description:** Request a password reset link that will be sent to user's email
+- **Required Fields:**
+  - `email` - The registered email address of the user
+- **Authentication:** Not Required
+- **Response:**
+  - Success: `200` with message `"Password reset link sent successfully"`
+  - Failure: `400` with message `"Unable to send reset link"`
+
+### Reset Password
+- **URL:** `/api/reset-password`
+- **Method:** `POST`
+- **Description:** Reset user's password using the token received via email
+- **Required Fields:**
+  - `email` - The email address of the user
+  - `password` - The new password (must contain at least 8 characters, including uppercase, lowercase, number, and special character)
+  - `password_confirmation` - Must match the password field
+  - `token` - The reset token received via email
+- **Authentication:** Not Required
+- **Response:**
+  - Success: `200` with message `"Password reset successfully"`
+  - Failure: `400` with message `"Invalid reset token"`
+  
 ## Using Authentication for Protected Routes
 
 For all protected routes, you must include the Bearer token in the Authorization header of your HTTP request. Here's an example of how to structure your requests:

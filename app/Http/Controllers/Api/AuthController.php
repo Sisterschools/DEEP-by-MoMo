@@ -11,6 +11,9 @@ use App\Events\UserRegisteredEvent;
 use App\Http\Requests\User\RegisterUserRequest;
 use App\Http\Requests\User\LoginUserRequest;
 use App\Http\Requests\User\UpdatePasswordRequest;
+use App\Http\Requests\User\ForgotPasswordRequest;
+use App\Http\Requests\User\ResetPasswordRequest;
+
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 use Illuminate\Support\Facades\Auth;
@@ -110,5 +113,36 @@ class AuthController extends Controller
         return response()->json([
             "message" => "Unauthenticated. Please login first",
         ], 401);
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Password reset link sent successfully'], 200)
+            : response()->json(['message' => 'Unable to send reset link'], 400);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                // event(new PasswordResetEvent($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Password reset successfully'], 200)
+            : response()->json(['message' => 'Invalid reset token'], 400);
     }
 }
