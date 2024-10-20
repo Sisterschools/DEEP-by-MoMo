@@ -10,20 +10,42 @@ export default{
     return {
       password: '',
       password_confirmation: '',
-      email: ''
+      email: '',
+      token: ''
     }
+  },
+  mounted(){
+    var query = window.location.hash
+    this.token = query.substring(query.indexOf('=')+1, query.indexOf('&')),
+    this.email = query.substring(query.indexOf('&email=')+7);
   },
   methods:{
     resetPassword(){
-      var query = window.location.hash,
-        token = query.substring(query.indexOf('=')+1);
       server('/api/reset-password', {
-        token: token, 
+        token: this.token, 
         password: this.password, 
         password_confirmation: this.password_confirmation,
         email: this.email
       }, 'POST')
-      .then( store.router.push('home') )
+      .then( () => {
+        server('/api/login', {
+          email: this.email, 
+          password: this.password
+        }, 
+        'POST')
+        .then( ( json ) => {
+          this.invalid = false
+          store.token = json.access_token
+          store.userData = json.data
+          store.router.push('/')
+          /*  
+            Different users can login using a different tab: so start the title with their name
+          */
+          var title = document.querySelector('title').innerText
+          document.querySelector('title').innerText = json.data.name + ' : ' + title
+          
+        })      
+      })
       .catch(makeErrorMsg)
     }
   }
@@ -39,6 +61,7 @@ export default{
     <label>Email:
       <input 
         v-model="email"
+        type="hidden"
       >
     </label>
     <label>New password:

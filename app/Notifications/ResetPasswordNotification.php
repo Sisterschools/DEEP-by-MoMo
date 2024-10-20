@@ -12,6 +12,7 @@ class ResetPasswordNotification extends Notification
     use Queueable;
 
     public $url = '';
+    public $email = '';
 
     /**
      * Create a new notification instance.
