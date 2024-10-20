@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification
+class ChoosePasswordNotification extends Notification
 {
     use Queueable;
 
@@ -37,8 +37,8 @@ class ResetPasswordNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('We received a password reset request for your account.')
-                    ->action('Please choose a new password', $this->url)
+                    ->line('Your account has been created.')
+                    ->action('Please choose a password', $this->url)
                     ->line('Thank you in advance for using our application!');
     }
 

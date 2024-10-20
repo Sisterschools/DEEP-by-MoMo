@@ -30,7 +30,6 @@ class StoreSchoolRequest extends FormRequest
             // Validation for the User model
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
 
             // Role validation (ensure it is always 'school')
             'role' => 'required|string|in:school',

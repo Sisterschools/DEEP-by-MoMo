@@ -13,8 +13,6 @@ export default{
       language: '',
       name: '',
       email: '',
-      password: '',
-      password_confirmation: '',
       address: '',
       description: '',
       phone_number: '',
@@ -64,8 +62,6 @@ export default{
         country: this.country,
         language: this.language,
         email: this.email,
-        password: this.password,
-        password_confirmation: this.password_confirmation,
         address: this.address,
         description: this.description,
         phone_number: this.phone_number,
@@ -126,26 +122,6 @@ export default{
           required
           type="email"
           autocomplete="email"
-        >
-      </label>
-      <label v-if="! $route.params.id">
-        Password : 
-        <input 
-          v-model="password"
-          required
-          type="password"
-          minlength="8"
-          autocomplete="new-password"
-        >
-      </label>
-      <label v-if="! $route.params.id">
-        Password : 
-        <input 
-          v-model="password_confirmation"
-          required
-          type="password"
-          minlength="8"
-          autocomplete="new-password"
         >
       </label>
       <label>

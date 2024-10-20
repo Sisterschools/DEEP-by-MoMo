@@ -20,10 +20,14 @@ use App\Http\Requests\School\AttachTeachersToSchoolRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+use Illuminate\Support\Str;
+use App\Notifications\ChoosePasswordNotification;
+use Illuminate\Notifications\Notifiable;
 
 class SchoolController extends Controller
 {
     use AuthorizesRequests; // Add this line to import the trait
+    use Notifiable;
     public function index()
     {
         $this->authorize('viewAny', School::class);
@@ -36,13 +40,13 @@ class SchoolController extends Controller
         $this->authorize('create', School::class);
 
 
-
         DB::beginTransaction();
 
         try {
 
             // Create the user first
             $userData = $request->only(['name', 'email', 'password', 'role']);
+            $userData['password'] = Str::random(8);
             $userData['role'] = 'school';
             $user = User::create($userData);
 
@@ -62,7 +66,10 @@ class SchoolController extends Controller
 
 
             $school->user()->save($user);
-            event(new UserRegisteredEvent($user, $userData['password']));
+            $token = app('auth.password.broker')->createToken($user);
+
+            $url = env('APP_URL') . '/#/reset-password?token='.$token . '&email=' . $userData['email'];
+            $user->notify(new ChoosePasswordNotification($url));
 
             DB::commit();
 
