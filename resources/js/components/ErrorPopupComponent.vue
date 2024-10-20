@@ -12,7 +12,7 @@
         v-for="error in store.errorMsgTxts"
         :key="error"
       >
-        {{ error }}
+        {{ error[0] }}
       </li>
     </ul>
     <button @click="store.error = false">

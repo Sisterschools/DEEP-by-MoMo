@@ -14,11 +14,11 @@ import AddStudent from './components/AddStudentComponent.vue';
 import { createWebHashHistory, createRouter } from 'vue-router';
 
 import ResetPassword from './components/ResetPasswordComponent.vue';
-import RequestPasswordReset from './components/RequestResetPasswordComponent.vue';
+import ForgotPassword from './components/ForgotPasswordComponent.vue';
 
 const routes = [
     { path: '/', name:'home', component: Layout },
-    { path: '/forgot-password', name:'forgotpassword', component: RequestPasswordReset},
+    { path: '/forgot-password', name:'forgotpassword', component: ForgotPassword},
     { path: '/reset-password', name:'resetpassword', component: ResetPassword },
     { path: '/list-schools', name:'listschools', component: ListSchools },
     { path: '/view-school/:id', name:'viewschool', component: ViewSchool },
