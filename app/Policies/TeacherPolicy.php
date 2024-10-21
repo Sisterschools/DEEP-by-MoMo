@@ -32,7 +32,7 @@ class TeacherPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === 'admin';
+        return in_array($user->role, ['admin', 'teacher']);
     }
 
     public function update(User $user, Teacher $teacher): bool

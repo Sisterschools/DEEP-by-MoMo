@@ -31,7 +31,10 @@ class SchoolController extends Controller
     public function index()
     {
         $this->authorize('viewAny', School::class);
-        $schools = School::paginate();
+        if(auth()->user()->role == 'admin')
+          $schools = School::paginate();
+        else
+          $schools = School::where('id', auth()->user()->profile_id)->paginate();
         return SchoolCollection::make($schools);
     }
 
@@ -64,8 +67,9 @@ class SchoolController extends Controller
             ]);
             $school = School::create($schoolData);
 
-
             $school->user()->save($user);
+
+            // Notify the user to choose a password
             $token = app('auth.password.broker')->createToken($user);
 
             $url = env('APP_URL') . '/#/reset-password?token='.$token . '&email=' . $userData['email'];

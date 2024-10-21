@@ -15,7 +15,7 @@
         if(this.userData.role == 'admin')
           return ListSchoolsComponent;
         else if( this.userData.role == 'school')
-          return ViewSchoolComponent
+          return ListSchoolsComponent
         else
           return ViewProgram
       }

@@ -14,6 +14,10 @@ use App\Http\Requests\Student\SearchStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
 use App\Http\Resources\StudentCollection;
 
+use Illuminate\Support\Str;
+use App\Notifications\ChoosePasswordNotification;
+use Illuminate\Notifications\Notifiable;
+
 class StudentController extends Controller
 {
     use AuthorizesRequests;
@@ -40,6 +44,7 @@ class StudentController extends Controller
         try {
             // Create the user first
             $userData = $request->only(['name', 'email', 'password', 'role']);
+            $userData['password'] = Str::random(8);
             $userData['role'] = 'student';
             $user = User::create($userData);
 
@@ -53,8 +58,11 @@ class StudentController extends Controller
             // Attach the student to selected schools
             $student->schools()->attach($request->school_ids);
 
-            // Dispatch UserRegisteredEvent
-            event(new UserRegisteredEvent($user, $userData['password']));
+            // Notify the user to choose a password
+            $token = app('auth.password.broker')->createToken($user);
+
+            $url = env('APP_URL') . '/#/reset-password?token='.$token . '&email=' . $userData['email'];
+            $user->notify(new ChoosePasswordNotification($url));
 
             DB::commit();
 

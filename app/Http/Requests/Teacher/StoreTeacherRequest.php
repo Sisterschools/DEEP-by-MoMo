@@ -24,7 +24,6 @@ class StoreTeacherRequest extends FormRequest
 
             // Validation for the User model
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
 
             // Validation for the associated school
             'school_ids' => 'required|array',

@@ -12,8 +12,6 @@ export default{
       phone_number: null,
       email: null,
       bio: null,
-      password: null,
-      password_confirmation: null,
       role: 'teacher'
     }
   },
@@ -33,8 +31,6 @@ export default{
       var data = { 
         name: this.name,
         email: this.email,
-        password: this.password,
-        password_confirmation: this.password_confirmation,
         phone_number: this.phone_number,
         bio: this.bio,
         school_ids: [store.currentSchool],
@@ -74,26 +70,6 @@ export default{
           required
           maxlength="255"
           autocomplete="false"
-        >
-      </label>
-      <label>
-        Password : 
-        <input 
-          v-model="password"
-          required
-          minlength="8"
-          autocomplete="false"
-          type="password"
-        >
-      </label>
-      <label>
-        Password : 
-        <input 
-          v-model="password_confirmation"
-          required
-          minlength="8"
-          autocomplete="false"
-          type="password"
         >
       </label>
       <label>
